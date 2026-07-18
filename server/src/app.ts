@@ -5,6 +5,7 @@ import authRoutes from './routes/auth.routes.js';
 import resumeRoutes from './routes/resume.routes.js';
 import coverRoutes from './routes/cover.routes.js';
 import emailRoutes from './routes/email.routes.js';
+import pdfRoutes from './routes/pdf.routes.js';
 
 dotenv.config();
 
@@ -26,6 +27,7 @@ app.use('/api/auth', authRoutes);
 app.use('/api/resumes', resumeRoutes);
 app.use('/api/covers', coverRoutes);
 app.use('/api/emails', emailRoutes);
+app.use('/api/pdf', pdfRoutes);
 
 // Basic Health Check Route
 app.get('/health', (req: Request, res: Response) => {
