@@ -1,6 +1,7 @@
 import express, { Request, Response, NextFunction } from 'express';
 import cors from 'cors';
 import dotenv from 'dotenv';
+import authRoutes from './routes/auth.routes.js';
 
 dotenv.config();
 
@@ -16,6 +17,9 @@ app.use(cors({
 // Body Parsers
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
+
+// Register Routes
+app.use('/api/auth', authRoutes);
 
 // Basic Health Check Route
 app.get('/health', (req: Request, res: Response) => {
