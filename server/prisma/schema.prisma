@@ -1,31 +1,10 @@
 datasource db {
-  provider = "postgresql"
+  provider = "sqlite"
   url      = env("DATABASE_URL")
 }
 
 generator client {
   provider = "prisma-client-js"
-}
-
-enum Role {
-  ADMIN
-  USER
-  GUEST
-}
-
-enum PlanType {
-  FREE
-  STARTER
-  PRO
-  ENTERPRISE
-}
-
-enum DocType {
-  RESUME
-  COVER_LETTER
-  EMAIL
-  MEETING_NOTES
-  PDF
 }
 
 model User {
@@ -34,7 +13,7 @@ model User {
   passwordHash     String?           // Nullable for OAuth accounts
   name             String?
   avatarUrl        String?
-  role             Role              @default(USER)
+  role             String            @default("USER") // ADMIN, USER, GUEST
   googleId         String?           @unique
   githubId         String?           @unique
   createdAt        DateTime          @default(now())
@@ -74,7 +53,7 @@ model Subscription {
   id                   String     @id @default(uuid())
   userId               String     @unique
   user                 User       @relation(fields: [userId], references: [id], onDelete: Cascade)
-  plan                 PlanType   @default(FREE)
+  plan                 String     @default("FREE") // FREE, STARTER, PRO, ENTERPRISE
   stripeCustomerId     String?    @unique
   stripeSubscriptionId String?    @unique
   stripePriceId        String?
@@ -134,9 +113,9 @@ model Document {
   userId    String
   user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
   name      String
-  type      DocType
+  type      String   // RESUME, COVER_LETTER, EMAIL, MEETING_NOTES, PDF
   fileUrl   String?  // Cloudinary storage link
-  content   String?  @db.Text
+  content   String?
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
 }
@@ -156,7 +135,7 @@ model ChatMessage {
   chatId    String
   chat      Chat     @relation(fields: [chatId], references: [id], onDelete: Cascade)
   role      String   // "user" or "assistant"
-  content   String   @db.Text
+  content   String
   citations Json?    // Array of sources: [{ page: Int, text: String, pdfName: String }]
   createdAt DateTime @default(now())
 }
@@ -194,10 +173,10 @@ model CoverLetter {
   title          String   @default("Untitled Cover Letter")
   companyName    String
   roleTitle      String
-  jobDescription String   @db.Text
+  jobDescription String
   tone           String   @default("professional") // professional, warm, bold
   length         String   @default("medium")       // short, medium, long
-  content        String   @db.Text
+  content        String
   createdAt      DateTime @default(now())
   updatedAt      DateTime @updatedAt
 }
@@ -207,7 +186,7 @@ model Email {
   userId      String
   user        User     @relation(fields: [userId], references: [id], onDelete: Cascade)
   subject     String
-  body        String   @db.Text
+  body        String
   purpose     String   // cold_outreach, application, follow_up, thank_you, invitation
   tone        String   @default("professional")
   recipient   String?
@@ -220,11 +199,11 @@ model Caption {
   userId      String
   user        User     @relation(fields: [userId], references: [id], onDelete: Cascade)
   imageUrl    String   // Cloudinary link
-  instaText   String?  @db.Text
-  linkedInText String? @db.Text
-  twitterText String?  @db.Text
-  seoText     String?  @db.Text
-  altText     String?  @db.Text
+  instaText   String?
+  linkedInText String?
+  twitterText String?
+  seoText     String?
+  altText     String?
   hashtags    Json?    // String array
   createdAt   DateTime @default(now())
 }
@@ -235,8 +214,8 @@ model Meeting {
   user        User     @relation(fields: [userId], references: [id], onDelete: Cascade)
   title       String   @default("New Meeting")
   audioUrl    String?  // Cloudinary storage for uploaded recording
-  transcript  String?  @db.Text
-  summary     String?  @db.Text
+  transcript  String?
+  summary     String?
   actionItems Json?    // Array of strings
   decisions   Json?    // Array of strings
   timeline    Json?    // [{ time: String, topic: String }]
