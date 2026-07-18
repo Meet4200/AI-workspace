@@ -1,0 +1,268 @@
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+enum Role {
+  ADMIN
+  USER
+  GUEST
+}
+
+enum PlanType {
+  FREE
+  STARTER
+  PRO
+  ENTERPRISE
+}
+
+enum DocType {
+  RESUME
+  COVER_LETTER
+  EMAIL
+  MEETING_NOTES
+  PDF
+}
+
+model User {
+  id               String            @id @default(uuid())
+  email            String            @unique
+  passwordHash     String?           // Nullable for OAuth accounts
+  name             String?
+  avatarUrl        String?
+  role             Role              @default(USER)
+  googleId         String?           @unique
+  githubId         String?           @unique
+  createdAt        DateTime          @default(now())
+  updatedAt        DateTime          @updatedAt
+  
+  // Relations
+  profile          Profile?
+  subscription     Subscription?
+  credit           Credit?
+  payments         Payment[]
+  notifications    Notification[]
+  history          History[]
+  documents        Document[]
+  chats            Chat[]
+  resumes          Resume[]
+  coverLetters     CoverLetter[]
+  emails           Email[]
+  meetings         Meeting[]
+  captions         Caption[]
+  interviews       InterviewHistory[]
+  settings         Setting?
+}
+
+model Profile {
+  id        String   @id @default(uuid())
+  userId    String   @unique
+  user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  bio       String?
+  jobTitle  String?
+  phone     String?
+  website   String?
+  location  String?
+  updatedAt DateTime @updatedAt
+}
+
+model Subscription {
+  id                   String     @id @default(uuid())
+  userId               String     @unique
+  user                 User       @relation(fields: [userId], references: [id], onDelete: Cascade)
+  plan                 PlanType   @default(FREE)
+  stripeCustomerId     String?    @unique
+  stripeSubscriptionId String?    @unique
+  stripePriceId        String?
+  status               String     @default("active") // active, trialing, canceled, past_due
+  currentPeriodStart   DateTime   @default(now())
+  currentPeriodEnd     DateTime   @default(now())
+  cancelAtPeriodEnd    Boolean    @default(false)
+  createdAt            DateTime   @default(now())
+  updatedAt            DateTime   @updatedAt
+}
+
+model Credit {
+  id             String   @id @default(uuid())
+  userId         String   @unique
+  user           User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  balance        Int      @default(50) // Free tier default credits
+  dailyCredits   Int      @default(5)  // Refreshed daily for free/starter
+  monthlyCredits Int      @default(50) // Refreshed monthly based on subscription
+  lastRefreshed  DateTime @default(now())
+  updatedAt      DateTime @updatedAt
+}
+
+model Payment {
+  id             String   @id @default(uuid())
+  userId         String
+  user           User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  stripeInvoiceId String?  @unique
+  amount         Int      // in cents
+  currency       String   @default("usd")
+  status         String   // paid, failed, pending
+  createdAt      DateTime @default(now())
+}
+
+model Notification {
+  id        String   @id @default(uuid())
+  userId    String
+  user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  title     String
+  message   String
+  isRead    Boolean  @default(false)
+  createdAt DateTime @default(now())
+}
+
+model History {
+  id         String   @id @default(uuid())
+  userId     String
+  user       User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  module     String   // "RESUME", "COVER_LETTER", "EMAIL", "PDF_CHAT", "MEETING", "INTERVIEW", "CAPTION"
+  action     String   // "GENERATE", "EDIT", "DELETE", "EXPORT"
+  tokensUsed Int      @default(0)
+  creditsUsed Int     @default(0)
+  createdAt  DateTime @default(now())
+}
+
+model Document {
+  id        String   @id @default(uuid())
+  userId    String
+  user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  name      String
+  type      DocType
+  fileUrl   String?  // Cloudinary storage link
+  content   String?  @db.Text
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+}
+
+model Chat {
+  id        String        @id @default(uuid())
+  userId    String
+  user      User          @relation(fields: [userId], references: [id], onDelete: Cascade)
+  title     String        @default("New Chat")
+  createdAt DateTime      @default(now())
+  updatedAt DateTime      @updatedAt
+  messages  ChatMessage[]
+}
+
+model ChatMessage {
+  id        String   @id @default(uuid())
+  chatId    String
+  chat      Chat     @relation(fields: [chatId], references: [id], onDelete: Cascade)
+  role      String   // "user" or "assistant"
+  content   String   @db.Text
+  citations Json?    // Array of sources: [{ page: Int, text: String, pdfName: String }]
+  createdAt DateTime @default(now())
+}
+
+model Resume {
+  id            String          @id @default(uuid())
+  userId        String
+  user          User            @relation(fields: [userId], references: [id], onDelete: Cascade)
+  title         String          @default("Untitled Resume")
+  templateId    String          @default("modern") // modern, minimalist, professional, creative
+  personalInfo  Json            // name, email, phone, summary, socialLinks
+  experience    Json            // Array of job details
+  education     Json            // Array of education details
+  skills        Json            // Array of skills
+  atsScore      Int             @default(0)
+  version       Int             @default(1)
+  createdAt     DateTime        @default(now())
+  updatedAt     DateTime        @updatedAt
+  history       ResumeVersion[]
+}
+
+model ResumeVersion {
+  id        String   @id @default(uuid())
+  resumeId  String
+  resume    Resume   @relation(fields: [resumeId], references: [id], onDelete: Cascade)
+  version   Int
+  data      Json
+  createdAt DateTime @default(now())
+}
+
+model CoverLetter {
+  id             String   @id @default(uuid())
+  userId         String
+  user           User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  title          String   @default("Untitled Cover Letter")
+  companyName    String
+  roleTitle      String
+  jobDescription String   @db.Text
+  tone           String   @default("professional") // professional, warm, bold
+  length         String   @default("medium")       // short, medium, long
+  content        String   @db.Text
+  createdAt      DateTime @default(now())
+  updatedAt      DateTime @updatedAt
+}
+
+model Email {
+  id          String   @id @default(uuid())
+  userId      String
+  user        User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  subject     String
+  body        String   @db.Text
+  purpose     String   // cold_outreach, application, follow_up, thank_you, invitation
+  tone        String   @default("professional")
+  recipient   String?
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+}
+
+model Caption {
+  id          String   @id @default(uuid())
+  userId      String
+  user        User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  imageUrl    String   // Cloudinary link
+  instaText   String?  @db.Text
+  linkedInText String? @db.Text
+  twitterText String?  @db.Text
+  seoText     String?  @db.Text
+  altText     String?  @db.Text
+  hashtags    Json?    // String array
+  createdAt   DateTime @default(now())
+}
+
+model Meeting {
+  id          String   @id @default(uuid())
+  userId      String
+  user        User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  title       String   @default("New Meeting")
+  audioUrl    String?  // Cloudinary storage for uploaded recording
+  transcript  String?  @db.Text
+  summary     String?  @db.Text
+  actionItems Json?    // Array of strings
+  decisions   Json?    // Array of strings
+  timeline    Json?    // [{ time: String, topic: String }]
+  tasks       Json?    // [{ assignee: String, task: String, dueDate: String }]
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+}
+
+model InterviewHistory {
+  id                String   @id @default(uuid())
+  userId            String
+  user              User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  position          String
+  transcript        Json     // Q&A transcripts: [{ question: String, answer: String, evaluation: String }]
+  confidenceScore   Int      @default(0) // 0-100
+  communicationScore Int     @default(0) // 0-100
+  suggestions       Json     // Array of recommendations
+  createdAt         DateTime @default(now())
+}
+
+model Setting {
+  id                  String   @id @default(uuid())
+  userId              String   @unique
+  user                User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  darkMode            Boolean  @default(true)
+  emailAlerts         Boolean  @default(true)
+  weeklyDigest        Boolean  @default(false)
+  updatedAt           DateTime @updatedAt
+}
