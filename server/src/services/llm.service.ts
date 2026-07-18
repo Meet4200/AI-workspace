@@ -99,3 +99,11 @@ I wanted to express my enthusiasm and provide the requested details in a ${data.
 Warm regards,
 [Your Name]`;
 }
+
+export async function improveEmail(text: string, tone: string): Promise<string> {
+  return `[AI Improved - ${tone}] Improved grammar, flow, and vocabulary: "${text.trim()}"`;
+}
+
+export async function translateEmail(text: string, language: string): Promise<string> {
+  return `[AI Translated - ${language}] ${text.trim()}`;
+}

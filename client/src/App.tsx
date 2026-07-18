@@ -16,6 +16,8 @@ import { ResumeList } from './pages/modules/resume/ResumeList.js';
 import { ResumeBuilder } from './pages/modules/resume/ResumeBuilder.js';
 import { CoverLetterList } from './pages/modules/cover/CoverLetterList.js';
 import { CoverLetterBuilder } from './pages/modules/cover/CoverLetterBuilder.js';
+import { EmailList } from './pages/modules/email/EmailList.js';
+import { EmailBuilder } from './pages/modules/email/EmailBuilder.js';
 
 const queryClient = new QueryClient();
 
@@ -45,7 +47,9 @@ function App() {
                 {/* Cover Letter Module */}
                 <Route path="/cover-letter" element={<CoverLetterList />} />
                 <Route path="/cover-letter/:id" element={<CoverLetterBuilder />} />
-                <Route path="/email-writer" element={<ModulePlaceholder name="AI Email Writer" phase="Phase 4" />} />
+                {/* Email Writer Module */}
+                <Route path="/email-writer" element={<EmailList />} />
+                <Route path="/email-writer/:id" element={<EmailBuilder />} />
                 <Route path="/pdf-chat" element={<ModulePlaceholder name="AI PDF Chat" phase="Phase 5" />} />
                 <Route path="/meeting-notes" element={<ModulePlaceholder name="AI Meeting Notes" phase="Phase 6" />} />
                 <Route path="/interview-coach" element={<ModulePlaceholder name="AI Interview Coach" phase="Phase 7" />} />
