@@ -18,6 +18,7 @@ interface UserCredits {
 interface UserSubscription {
   plan: 'FREE' | 'STARTER' | 'PRO' | 'ENTERPRISE';
   status: string;
+  currentPeriodEnd?: string | Date;
 }
 
 interface UserSettings {

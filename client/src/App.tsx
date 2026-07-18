@@ -11,7 +11,7 @@ import { ForgotPassword } from './pages/auth/ForgotPassword.js';
 import { ResetPassword } from './pages/auth/ResetPassword.js';
 import { Profile } from './pages/auth/Profile.js';
 import { Settings } from './pages/auth/Settings.js';
-import { ModulePlaceholder } from './components/ModulePlaceholder.js';
+
 import { ResumeList } from './pages/modules/resume/ResumeList.js';
 import { ResumeBuilder } from './pages/modules/resume/ResumeBuilder.js';
 import { CoverLetterList } from './pages/modules/cover/CoverLetterList.js';
@@ -20,6 +20,11 @@ import { EmailList } from './pages/modules/email/EmailList.js';
 import { EmailBuilder } from './pages/modules/email/EmailBuilder.js';
 import { PdfChatList } from './pages/modules/pdf/PdfChatList.js';
 import { PdfChatWorkspace } from './pages/modules/pdf/PdfChatWorkspace.js';
+import { MeetingNotes } from './pages/modules/meeting/MeetingNotes.js';
+import { InterviewCoach } from './pages/modules/interview/InterviewCoach.js';
+import { CaptionGenerator } from './pages/modules/caption/CaptionGenerator.js';
+import { Billing } from './pages/modules/billing/Billing.js';
+import { AdminDashboard } from './pages/modules/admin/AdminDashboard.js';
 
 const queryClient = new QueryClient();
 
@@ -55,10 +60,14 @@ function App() {
                 {/* PDF RAG Chat Module */}
                 <Route path="/pdf-chat" element={<PdfChatList />} />
                 <Route path="/pdf-chat/:id" element={<PdfChatWorkspace />} />
-                <Route path="/meeting-notes" element={<ModulePlaceholder name="AI Meeting Notes" phase="Phase 6" />} />
-                <Route path="/interview-coach" element={<ModulePlaceholder name="AI Interview Coach" phase="Phase 7" />} />
-                <Route path="/caption-gen" element={<ModulePlaceholder name="AI Image Caption Generator" phase="Phase 8" />} />
-                <Route path="/billing" element={<ModulePlaceholder name="SaaS Subscription System" phase="Phase 9" />} />
+                {/* Meeting Notes */}
+                <Route path="/meeting-notes" element={<MeetingNotes />} />
+                {/* Interview Coach */}
+                <Route path="/interview-coach" element={<InterviewCoach />} />
+                {/* Caption Generator */}
+                <Route path="/caption-gen" element={<CaptionGenerator />} />
+                {/* Billing */}
+                <Route path="/billing" element={<Billing />} />
               </Route>
             </Route>
 
@@ -66,7 +75,8 @@ function App() {
             <Route element={<ProtectedRoute />}>
               <Route element={<AdminRoute />}>
                 <Route element={<DashboardLayout />}>
-                  <Route path="/admin" element={<ModulePlaceholder name="Admin Dashboard" phase="Phase 10" />} />
+                  {/* Admin Dashboard */}
+                  <Route path="/admin" element={<AdminDashboard />} />
                 </Route>
               </Route>
             </Route>

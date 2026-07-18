@@ -6,6 +6,11 @@ import resumeRoutes from './routes/resume.routes.js';
 import coverRoutes from './routes/cover.routes.js';
 import emailRoutes from './routes/email.routes.js';
 import pdfRoutes from './routes/pdf.routes.js';
+import meetingRoutes from './routes/meeting.routes.js';
+import interviewRoutes from './routes/interview.routes.js';
+import captionRoutes from './routes/caption.routes.js';
+import billingRoutes from './routes/billing.routes.js';
+import adminRoutes from './routes/admin.routes.js';
 
 dotenv.config();
 
@@ -28,6 +33,11 @@ app.use('/api/resumes', resumeRoutes);
 app.use('/api/covers', coverRoutes);
 app.use('/api/emails', emailRoutes);
 app.use('/api/pdf', pdfRoutes);
+app.use('/api/meetings', meetingRoutes);
+app.use('/api/interviews', interviewRoutes);
+app.use('/api/captions', captionRoutes);
+app.use('/api/billing', billingRoutes);
+app.use('/api/admin', adminRoutes);
 
 // Basic Health Check Route
 app.get('/health', (req: Request, res: Response) => {
