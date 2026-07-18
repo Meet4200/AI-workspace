@@ -14,6 +14,8 @@ import { Settings } from './pages/auth/Settings.js';
 import { ModulePlaceholder } from './components/ModulePlaceholder.js';
 import { ResumeList } from './pages/modules/resume/ResumeList.js';
 import { ResumeBuilder } from './pages/modules/resume/ResumeBuilder.js';
+import { CoverLetterList } from './pages/modules/cover/CoverLetterList.js';
+import { CoverLetterBuilder } from './pages/modules/cover/CoverLetterBuilder.js';
 
 const queryClient = new QueryClient();
 
@@ -40,7 +42,9 @@ function App() {
                 {/* Resume Builder Module */}
                 <Route path="/resume" element={<ResumeList />} />
                 <Route path="/resume/:id" element={<ResumeBuilder />} />
-                <Route path="/cover-letter" element={<ModulePlaceholder name="Cover Letter Generator" phase="Phase 3" />} />
+                {/* Cover Letter Module */}
+                <Route path="/cover-letter" element={<CoverLetterList />} />
+                <Route path="/cover-letter/:id" element={<CoverLetterBuilder />} />
                 <Route path="/email-writer" element={<ModulePlaceholder name="AI Email Writer" phase="Phase 4" />} />
                 <Route path="/pdf-chat" element={<ModulePlaceholder name="AI PDF Chat" phase="Phase 5" />} />
                 <Route path="/meeting-notes" element={<ModulePlaceholder name="AI Meeting Notes" phase="Phase 6" />} />
