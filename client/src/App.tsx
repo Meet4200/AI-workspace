@@ -12,6 +12,8 @@ import { ResetPassword } from './pages/auth/ResetPassword.js';
 import { Profile } from './pages/auth/Profile.js';
 import { Settings } from './pages/auth/Settings.js';
 import { ModulePlaceholder } from './components/ModulePlaceholder.js';
+import { ResumeList } from './pages/modules/resume/ResumeList.js';
+import { ResumeBuilder } from './pages/modules/resume/ResumeBuilder.js';
 
 const queryClient = new QueryClient();
 
@@ -35,7 +37,9 @@ function App() {
                 <Route path="/settings" element={<Settings />} />
                 
                 {/* Modules under construction */}
-                <Route path="/resume" element={<ModulePlaceholder name="Resume Builder" phase="Phase 2" />} />
+                {/* Resume Builder Module */}
+                <Route path="/resume" element={<ResumeList />} />
+                <Route path="/resume/:id" element={<ResumeBuilder />} />
                 <Route path="/cover-letter" element={<ModulePlaceholder name="Cover Letter Generator" phase="Phase 3" />} />
                 <Route path="/email-writer" element={<ModulePlaceholder name="AI Email Writer" phase="Phase 4" />} />
                 <Route path="/pdf-chat" element={<ModulePlaceholder name="AI PDF Chat" phase="Phase 5" />} />
